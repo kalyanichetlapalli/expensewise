@@ -47,11 +47,11 @@ const recentExpenses = [
 
 //todo: remove mock data - budget tracking
 const budgetData = [
-  { category: "Food & Dining", budget: 1000, spent: 750, monthlyExpense: 650, yearlyExpense: 100 },
-  { category: "Transportation", budget: 500, spent: 320, monthlyExpense: 320, yearlyExpense: 0 },
-  { category: "Shopping", budget: 800, spent: 1200, monthlyExpense: 400, yearlyExpense: 800 },
-  { category: "Bills", budget: 1500, spent: 1650, monthlyExpense: 450, yearlyExpense: 1200 },
-  { category: "Entertainment", budget: 400, spent: 250, monthlyExpense: 250, yearlyExpense: 0 },
+  { category: "Food & Dining", monthlyBudget: 1000, yearlyBudget: 500, monthlySpent: 750, yearlySpent: 100 },
+  { category: "Transportation", monthlyBudget: 500, yearlyBudget: 0, monthlySpent: 320, yearlySpent: 0 },
+  { category: "Shopping", monthlyBudget: 600, yearlyBudget: 1000, monthlySpent: 400, yearlySpent: 1200 },
+  { category: "Bills", monthlyBudget: 600, yearlyBudget: 1500, monthlySpent: 750, yearlySpent: 1800 },
+  { category: "Entertainment", monthlyBudget: 400, yearlyBudget: 0, monthlySpent: 250, yearlySpent: 0 },
 ];
 
 export default function Dashboard() {
@@ -60,7 +60,11 @@ export default function Dashboard() {
   const totalExpenses = 7800;
   const remainingBudget = totalIncome - totalExpenses;
 
-  const overBudgetCategories = budgetData.filter(item => item.spent > item.budget);
+  const overBudgetCategories = budgetData.filter(item => {
+    const monthlyOver = item.monthlyBudget > 0 && item.monthlySpent > item.monthlyBudget;
+    const yearlyOver = item.yearlyBudget > 0 && item.yearlySpent > item.yearlyBudget;
+    return monthlyOver || yearlyOver;
+  });
   const hasOverBudgetItems = overBudgetCategories.length > 0;
 
   return (
@@ -83,51 +87,70 @@ export default function Dashboard() {
               The following categories have exceeded their budget limits:
             </p>
             {overBudgetCategories.map((item) => {
-              const percentage = (item.spent / item.budget) * 100;
-              const overspent = item.spent - item.budget;
+              const monthlyOver = item.monthlyBudget > 0 && item.monthlySpent > item.monthlyBudget;
+              const yearlyOver = item.yearlyBudget > 0 && item.yearlySpent > item.yearlyBudget;
+              
               return (
                 <div 
                   key={item.category} 
-                  className="p-4 rounded-lg border border-destructive/20 bg-card space-y-3"
+                  className="p-4 rounded-lg border border-destructive/20 bg-card space-y-4"
                   data-testid={`alert-${item.category.toLowerCase().replace(/\s+/g, '-')}`}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <h4 className="font-semibold">{item.category}</h4>
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
-                          {item.monthlyExpense > 0 && (
-                            <Badge variant="default" className="text-xs">
-                              Monthly: ${item.monthlyExpense}
-                            </Badge>
-                          )}
-                          {item.yearlyExpense > 0 && (
-                            <Badge variant="secondary" className="text-xs">
-                              Yearly: ${item.yearlyExpense}
-                            </Badge>
-                          )}
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <h4 className="font-semibold text-lg">{item.category}</h4>
+                  </div>
+                  
+                  {monthlyOver && (
+                    <div className="space-y-2 p-3 rounded-md bg-destructive/5 border border-destructive/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="default" className="text-xs">Monthly</Badge>
+                          <span className="text-sm font-medium">Budget Exceeded</span>
                         </div>
+                        <span className="text-xs text-destructive font-medium">
+                          {((item.monthlySpent / item.monthlyBudget) * 100).toFixed(0)}%
+                        </span>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-muted-foreground">
-                        Budget: ${item.budget}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Spent: ${item.monthlySpent.toFixed(2)} / ${item.monthlyBudget.toFixed(2)}
+                        </span>
+                        <span className="font-bold text-destructive">
+                          Over by ${(item.monthlySpent - item.monthlyBudget).toFixed(2)}
+                        </span>
                       </div>
-                      <div className="text-lg font-bold text-destructive">
-                        Over by ${overspent.toFixed(2)}
+                      <Progress 
+                        value={Math.min((item.monthlySpent / item.monthlyBudget) * 100, 100)} 
+                        className="h-2"
+                      />
+                    </div>
+                  )}
+                  
+                  {yearlyOver && (
+                    <div className="space-y-2 p-3 rounded-md bg-destructive/5 border border-destructive/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">Yearly</Badge>
+                          <span className="text-sm font-medium">Budget Exceeded</span>
+                        </div>
+                        <span className="text-xs text-destructive font-medium">
+                          {((item.yearlySpent / item.yearlyBudget) * 100).toFixed(0)}%
+                        </span>
                       </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Spent: ${item.yearlySpent.toFixed(2)} / ${item.yearlyBudget.toFixed(2)}
+                        </span>
+                        <span className="font-bold text-destructive">
+                          Over by ${(item.yearlySpent - item.yearlyBudget).toFixed(2)}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={Math.min((item.yearlySpent / item.yearlyBudget) * 100, 100)} 
+                        className="h-2"
+                      />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Spent: ${item.spent.toFixed(2)}</span>
-                      <span className="text-destructive font-medium">{percentage.toFixed(0)}%</span>
-                    </div>
-                    <Progress 
-                      value={Math.min(percentage, 100)} 
-                      className="h-2"
-                    />
-                  </div>
+                  )}
                 </div>
               );
             })}
