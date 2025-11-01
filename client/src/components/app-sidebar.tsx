@@ -3,6 +3,7 @@ import {
   FolderOpen,
   Wallet,
   PlusCircle,
+  TrendingUp,
   Settings,
 } from "lucide-react";
 import { useLocation } from "wouter";
@@ -35,9 +36,14 @@ const menuItems = [
     icon: Wallet,
   },
   {
-    title: "Add Expense",
+    title: "Expenses",
     url: "/expenses",
     icon: PlusCircle,
+  },
+  {
+    title: "Income",
+    url: "/income",
+    icon: TrendingUp,
   },
   {
     title: "Settings",

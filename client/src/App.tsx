@@ -11,6 +11,7 @@ import Dashboard from "@/pages/dashboard";
 import Categories from "@/pages/categories";
 import Budgets from "@/pages/budgets";
 import Expenses from "@/pages/expenses";
+import Income from "@/pages/income";
 import Settings from "@/pages/settings";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
@@ -32,6 +33,7 @@ function MainRouter() {
       <Route path="/categories" component={Categories} />
       <Route path="/budgets" component={Budgets} />
       <Route path="/expenses" component={Expenses} />
+      <Route path="/income" component={Income} />
       <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
