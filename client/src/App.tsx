@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,11 +16,18 @@ import Login from "@/pages/login";
 import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+function AuthRouter() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+    </Switch>
+  );
+}
+
+function MainRouter() {
+  return (
+    <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/categories" component={Categories} />
       <Route path="/budgets" component={Budgets} />
@@ -32,10 +39,17 @@ function Router() {
 }
 
 function AppContent() {
+  const [location] = useLocation();
+  const isAuthPage = location === "/login" || location === "/register";
+
   const style = {
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "3rem",
   };
+
+  if (isAuthPage) {
+    return <AuthRouter />;
+  }
 
   return (
     <SidebarProvider style={style as React.CSSProperties}>
@@ -47,7 +61,7 @@ function AppContent() {
             <ThemeToggle />
           </header>
           <main className="flex-1 overflow-auto">
-            <Router />
+            <MainRouter />
           </main>
         </div>
       </div>
