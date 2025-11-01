@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Download, Calendar } from "lucide-react";
+import { Plus, Search, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
 //todo: remove mock data
@@ -40,6 +48,7 @@ const mockIncomes: Income[] = [
 
 export default function Income() {
   const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     source: "",
     amount: "",
@@ -62,6 +71,7 @@ export default function Income() {
       amount: "",
       date: new Date().toISOString().split('T')[0],
     });
+    setIsDialogOpen(false);
   };
 
   const filteredIncomes = incomes.filter((income) => {
@@ -93,86 +103,92 @@ export default function Income() {
 
   return (
     <div className="p-6 md:p-8 space-y-8">
-      <div>
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">Income</h1>
-        <p className="text-muted-foreground">Record and track your income sources</p>
-      </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Income</h1>
+          <p className="text-muted-foreground">Track your income sources</p>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button data-testid="button-open-add-income">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Income
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Add New Income</DialogTitle>
+              <DialogDescription>
+                Record a new income transaction
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="source">Source of Income *</Label>
+                  <Select
+                    value={formData.source}
+                    onValueChange={(value) => setFormData({ ...formData, source: value })}
+                    required
+                  >
+                    <SelectTrigger id="source" data-testid="select-income-source">
+                      <SelectValue placeholder="Select source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {incomeSources.map((source) => (
+                        <SelectItem key={source} value={source}>
+                          {source}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Add Income</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="source">Source of Income *</Label>
-                <Select
-                  value={formData.source}
-                  onValueChange={(value) => setFormData({ ...formData, source: value })}
-                  required
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Amount ($) *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    placeholder="0.00"
+                    required
+                    data-testid="input-income-amount"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="date">Date Received *</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    required
+                    data-testid="input-income-date"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  data-testid="button-cancel"
                 >
-                  <SelectTrigger id="source" data-testid="select-income-source">
-                    <SelectValue placeholder="Select source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {incomeSources.map((source) => (
-                      <SelectItem key={source} value={source}>
-                        {source}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Cancel
+                </Button>
+                <Button type="submit" data-testid="button-add-income">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Income
+                </Button>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount ($) *</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  placeholder="0.00"
-                  required
-                  data-testid="input-income-amount"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="date">Date Received *</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  required
-                  data-testid="input-income-date"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setFormData({
-                  source: "",
-                  amount: "",
-                  date: new Date().toISOString().split('T')[0],
-                })}
-                data-testid="button-reset"
-              >
-                Reset
-              </Button>
-              <Button type="submit" data-testid="button-add-income">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Income
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <Card>
         <CardHeader>
