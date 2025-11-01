@@ -1,4 +1,5 @@
 import { DollarSign, TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -57,37 +58,41 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl md:text-3xl font-bold font-mono" data-testid="text-total-income">
-              ${totalIncome.toLocaleString()}
-            </div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-              <TrendingUp className="h-3 w-3 text-chart-2" />
-              <span>+12.5% from last month</span>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/income">
+          <Card className="cursor-pointer hover-elevate active-elevate-2" data-testid="card-total-income">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl md:text-3xl font-bold font-mono" data-testid="text-total-income">
+                ${totalIncome.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                <TrendingUp className="h-3 w-3 text-chart-2" />
+                <span>+12.5% from last month</span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-            <TrendingDown className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl md:text-3xl font-bold font-mono" data-testid="text-total-expenses">
-              ${totalExpenses.toLocaleString()}
-            </div>
-            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-              <TrendingDown className="h-3 w-3 text-destructive" />
-              <span>+8.2% from last month</span>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/expenses">
+          <Card className="cursor-pointer hover-elevate active-elevate-2" data-testid="card-total-expenses">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+              <TrendingDown className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl md:text-3xl font-bold font-mono" data-testid="text-total-expenses">
+                ${totalExpenses.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                <TrendingDown className="h-3 w-3 text-destructive" />
+                <span>+8.2% from last month</span>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
