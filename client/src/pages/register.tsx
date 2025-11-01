@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import logoImage from "@assets/Gemini_Generated_Image_gg73flgg73flgg73_1762001408809.png";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -28,14 +28,14 @@ export default function Register() {
       <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80" />
         <div className="relative z-10 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20">
-              <Wallet className="w-12 h-12 text-primary-foreground" />
-            </div>
+          <div className="flex justify-center mb-8">
+            <img 
+              src={logoImage} 
+              alt="Expense Wise Logo" 
+              className="w-48 h-48 object-contain"
+              data-testid="img-logo-large"
+            />
           </div>
-          <h1 className="text-5xl font-bold text-primary-foreground mb-4">
-            Expense Tracker
-          </h1>
           <p className="text-xl text-primary-foreground/90 max-w-md">
             Take control of your finances. Track expenses, manage budgets, and achieve your financial goals.
           </p>
@@ -46,12 +46,15 @@ export default function Register() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:text-left">
             <div className="flex lg:hidden justify-center mb-6">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary">
-                <Wallet className="w-7 h-7 text-primary-foreground" />
-              </div>
+              <img 
+                src={logoImage} 
+                alt="Expense Wise Logo" 
+                className="w-16 h-16 object-contain"
+                data-testid="img-logo-mobile"
+              />
             </div>
             <h2 className="text-3xl font-bold">Create Account</h2>
-            <p className="text-muted-foreground mt-2">Sign up to start tracking your expenses</p>
+            <p className="text-muted-foreground mt-2">Sign up to start tracking with Expense Wise</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

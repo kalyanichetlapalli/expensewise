@@ -18,6 +18,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import logoImage from "@assets/Gemini_Generated_Image_gg73flgg73flgg73_1762001408809.png";
 
 const menuItems = [
   {
@@ -58,12 +59,15 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-6 border-b">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
-            <Wallet className="w-5 h-5 text-primary-foreground" />
-          </div>
+        <div className="flex items-center gap-3">
+          <img 
+            src={logoImage} 
+            alt="Expense Wise Logo" 
+            className="w-10 h-10 object-contain"
+            data-testid="img-logo"
+          />
           <div className="flex flex-col">
-            <span className="text-lg font-semibold">Expense Tracker</span>
+            <span className="text-lg font-semibold">Expense Wise</span>
           </div>
         </div>
       </SidebarHeader>
