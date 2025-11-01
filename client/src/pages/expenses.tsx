@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -47,14 +48,16 @@ type Expense = {
   description: string;
   date: string;
   paymentType: string;
+  frequency: "monthly" | "yearly" | "one-time";
 };
 
 const mockExpenses: Expense[] = [
-  { id: "1", category: "Food & Dining", amount: 45.50, description: "Lunch at restaurant", date: "2024-11-01", paymentType: "Card" },
-  { id: "2", category: "Transportation", amount: 20.00, description: "Uber ride", date: "2024-11-02", paymentType: "UPI" },
-  { id: "3", category: "Shopping", amount: 89.99, description: "New shoes", date: "2024-10-28", paymentType: "Card" },
-  { id: "4", category: "Bills", amount: 150.00, description: "Electricity bill", date: "2024-10-25", paymentType: "Bank Transfer" },
-  { id: "5", category: "Entertainment", amount: 35.00, description: "Movie tickets", date: "2024-11-05", paymentType: "Cash" },
+  { id: "1", category: "Food & Dining", amount: 45.50, description: "Lunch at restaurant", date: "2024-11-01", paymentType: "Card", frequency: "one-time" },
+  { id: "2", category: "Transportation", amount: 20.00, description: "Uber ride", date: "2024-11-02", paymentType: "UPI", frequency: "one-time" },
+  { id: "3", category: "Shopping", amount: 89.99, description: "New shoes", date: "2024-10-28", paymentType: "Card", frequency: "one-time" },
+  { id: "4", category: "Bills", amount: 150.00, description: "Electricity bill", date: "2024-10-25", paymentType: "Bank Transfer", frequency: "monthly" },
+  { id: "5", category: "Entertainment", amount: 35.00, description: "Movie tickets", date: "2024-11-05", paymentType: "Cash", frequency: "one-time" },
+  { id: "6", category: "Bills", amount: 1200.00, description: "Annual insurance", date: "2024-10-15", paymentType: "Bank Transfer", frequency: "yearly" },
 ];
 
 export default function Expenses() {
@@ -66,6 +69,7 @@ export default function Expenses() {
     description: "",
     date: new Date().toISOString().split('T')[0],
     paymentType: "",
+    frequency: "one-time" as "monthly" | "yearly" | "one-time",
   });
   const [expenses] = useState<Expense[]>(mockExpenses);
   const [searchTerm, setSearchTerm] = useState("");
@@ -85,6 +89,7 @@ export default function Expenses() {
       description: "",
       date: new Date().toISOString().split('T')[0],
       paymentType: "",
+      frequency: "one-time",
     });
     setIsDialogOpen(false);
   };
@@ -213,6 +218,24 @@ export default function Expenses() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="frequency">Frequency *</Label>
+                  <Select
+                    value={formData.frequency}
+                    onValueChange={(value) => setFormData({ ...formData, frequency: value as "monthly" | "yearly" | "one-time" })}
+                    required
+                  >
+                    <SelectTrigger id="frequency" data-testid="select-expense-frequency">
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="one-time">One-Time</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="yearly">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -325,12 +348,13 @@ export default function Expenses() {
                   <TableHead>Amount</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Payment</TableHead>
+                  <TableHead>Frequency</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredExpenses.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                       No expenses found
                     </TableCell>
                   </TableRow>
@@ -344,6 +368,14 @@ export default function Expenses() {
                       </TableCell>
                       <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
                       <TableCell>{expense.paymentType}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={expense.frequency === "monthly" ? "default" : expense.frequency === "yearly" ? "secondary" : "outline"}
+                          data-testid={`badge-frequency-${expense.id}`}
+                        >
+                          {expense.frequency === "one-time" ? "One-Time" : expense.frequency === "monthly" ? "Monthly" : "Yearly"}
+                        </Badge>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

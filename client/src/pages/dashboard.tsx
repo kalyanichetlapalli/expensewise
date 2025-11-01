@@ -1,7 +1,8 @@
-import { DollarSign, TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, Wallet, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   BarChart,
   Bar,
@@ -44,11 +45,23 @@ const recentExpenses = [
   { id: 5, category: "Bills", description: "Internet bill", amount: 79.99, date: "2024-10-29", type: "Card" },
 ];
 
+//todo: remove mock data - budget tracking
+const budgetData = [
+  { category: "Food & Dining", budget: 1000, spent: 750, monthlyExpense: 650, yearlyExpense: 100 },
+  { category: "Transportation", budget: 500, spent: 320, monthlyExpense: 320, yearlyExpense: 0 },
+  { category: "Shopping", budget: 800, spent: 1200, monthlyExpense: 400, yearlyExpense: 800 },
+  { category: "Bills", budget: 1500, spent: 1650, monthlyExpense: 450, yearlyExpense: 1200 },
+  { category: "Entertainment", budget: 400, spent: 250, monthlyExpense: 250, yearlyExpense: 0 },
+];
+
 export default function Dashboard() {
   //todo: remove mock functionality
   const totalIncome = 12500;
   const totalExpenses = 7800;
   const remainingBudget = totalIncome - totalExpenses;
+
+  const overBudgetCategories = budgetData.filter(item => item.spent > item.budget);
+  const hasOverBudgetItems = overBudgetCategories.length > 0;
 
   return (
     <div className="p-6 md:p-8 space-y-8">
@@ -56,6 +69,71 @@ export default function Dashboard() {
         <h1 className="text-3xl md:text-4xl font-bold mb-2">Dashboard</h1>
         <p className="text-muted-foreground">Overview of your financial activity</p>
       </div>
+
+      {hasOverBudgetItems && (
+        <Card className="border-destructive bg-destructive/5" data-testid="card-budget-alerts">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <CardTitle className="text-destructive">Budget Alerts</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              The following categories have exceeded their budget limits:
+            </p>
+            {overBudgetCategories.map((item) => {
+              const percentage = (item.spent / item.budget) * 100;
+              const overspent = item.spent - item.budget;
+              return (
+                <div 
+                  key={item.category} 
+                  className="p-4 rounded-lg border border-destructive/20 bg-card space-y-3"
+                  data-testid={`alert-${item.category.toLowerCase().replace(/\s+/g, '-')}`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <h4 className="font-semibold">{item.category}</h4>
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          {item.monthlyExpense > 0 && (
+                            <Badge variant="default" className="text-xs">
+                              Monthly: ${item.monthlyExpense}
+                            </Badge>
+                          )}
+                          {item.yearlyExpense > 0 && (
+                            <Badge variant="secondary" className="text-xs">
+                              Yearly: ${item.yearlyExpense}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground">
+                        Budget: ${item.budget}
+                      </div>
+                      <div className="text-lg font-bold text-destructive">
+                        Over by ${overspent.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Spent: ${item.spent.toFixed(2)}</span>
+                      <span className="text-destructive font-medium">{percentage.toFixed(0)}%</span>
+                    </div>
+                    <Progress 
+                      value={Math.min(percentage, 100)} 
+                      className="h-2"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link href="/income">
