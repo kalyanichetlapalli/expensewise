@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Lock, DollarSign } from "lucide-react";
+import { User, Lock, DollarSign, Mail, CheckCircle2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -29,6 +30,10 @@ export default function Settings() {
     confirm: "",
   });
   const [currency, setCurrency] = useState("USD");
+  const [connectedEmails, setConnectedEmails] = useState<Array<{ provider: string; email: string; connected: boolean }>>([
+    { provider: "Gmail", email: "", connected: false },
+    { provider: "Outlook", email: "", connected: false },
+  ]);
 
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +68,35 @@ export default function Settings() {
     toast({
       title: "Currency Updated",
       description: `Currency preference set to ${value}.`,
+    });
+  };
+
+  const handleEmailConnect = (provider: string) => {
+    console.log(`Connecting to ${provider}...`);
+    const emailAddress = prompt(`Enter your ${provider} email address:`);
+    if (emailAddress) {
+      setConnectedEmails(connectedEmails.map(item =>
+        item.provider === provider
+          ? { ...item, email: emailAddress, connected: true }
+          : item
+      ));
+      toast({
+        title: "Email Connected",
+        description: `Successfully connected ${emailAddress} (${provider})`,
+      });
+    }
+  };
+
+  const handleEmailDisconnect = (provider: string) => {
+    setConnectedEmails(connectedEmails.map(item =>
+      item.provider === provider
+        ? { ...item, email: "", connected: false }
+        : item
+    ));
+    console.log(`Disconnected ${provider}`);
+    toast({
+      title: "Email Disconnected",
+      description: `${provider} account has been disconnected.`,
     });
   };
 
@@ -180,6 +214,72 @@ export default function Settings() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Mail className="w-5 h-5" />
+              <CardTitle>Email Account Connections</CardTitle>
+            </div>
+            <CardDescription>Connect your email accounts to sync and manage expenses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {connectedEmails.map((emailAccount) => (
+                <div
+                  key={emailAccount.provider}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{emailAccount.provider}</p>
+                        {emailAccount.connected && (
+                          <Badge variant="outline" className="gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Connected
+                          </Badge>
+                        )}
+                      </div>
+                      {emailAccount.connected && emailAccount.email && (
+                        <p className="text-sm text-muted-foreground">{emailAccount.email}</p>
+                      )}
+                      {!emailAccount.connected && (
+                        <p className="text-sm text-muted-foreground">
+                          Not connected
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    {emailAccount.connected ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEmailDisconnect(emailAccount.provider)}
+                        data-testid={`button-disconnect-${emailAccount.provider.toLowerCase()}`}
+                      >
+                        Disconnect
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => handleEmailConnect(emailAccount.provider)}
+                        data-testid={`button-connect-${emailAccount.provider.toLowerCase()}`}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Connect
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

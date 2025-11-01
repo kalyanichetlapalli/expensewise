@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -50,6 +52,17 @@ export default function Register() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="johndoe"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                required
+                data-testid="input-username"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -59,6 +72,18 @@ export default function Register() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
                 data-testid="input-email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                placeholder="+1 (555) 000-0000"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                required
+                data-testid="input-phone"
               />
             </div>
             <div className="space-y-2">
