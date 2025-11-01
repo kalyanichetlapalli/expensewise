@@ -18,7 +18,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80" />
+        <div className="absolute inset-0 from-primary to-primary/80 text-[#ffffff] bg-[#92bfb4]" />
         <div className="relative z-10 text-center">
           <div className="flex justify-center mb-8">
             <img 
@@ -33,7 +33,6 @@ export default function Login() {
           </p>
         </div>
       </div>
-
       <div className="flex-1 flex items-center justify-center p-6 md:p-12 bg-background">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:text-left">
