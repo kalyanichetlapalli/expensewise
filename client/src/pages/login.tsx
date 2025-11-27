@@ -1,19 +1,29 @@
-import { useState } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import logoImage from "@assets/Gemini_Generated_Image_gg73flgg73flgg73_1762001408809.png";
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+  const [, setLocation] = useLocation();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Login submitted:', formData);
-  };
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation('/');
+    }
+  }, [isAuthenticated, setLocation]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -44,51 +54,49 @@ export default function Login() {
                 data-testid="img-logo-mobile"
               />
             </div>
-            <h2 className="text-3xl font-bold">Welcome Back</h2>
-            <p className="text-muted-foreground mt-2">Sign in to your Expense Wise account</p>
+            <h2 className="text-3xl font-bold">Welcome to Expense Wise</h2>
+            <p className="text-muted-foreground mt-2">Sign in to manage your finances</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john.doe@example.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                data-testid="input-email"
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="text-sm text-primary hover:underline"
-                  data-testid="link-forgot-password"
-                >
-                  Forgot password?
-                </a>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                data-testid="input-password"
-              />
-            </div>
-            <Button type="submit" className="w-full" data-testid="button-login">
-              Sign In
+          <div className="space-y-4">
+            <Button 
+              onClick={() => loginWithRedirect()} 
+              className="w-full"
+              size="lg"
+              data-testid="button-login"
+            >
+              Sign In with Auth0
             </Button>
-          </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or
+                </span>
+              </div>
+            </div>
+
+            <Button 
+              onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })} 
+              variant="outline"
+              className="w-full"
+              size="lg"
+              data-testid="button-signup"
+            >
+              Create New Account
+            </Button>
+          </div>
 
           <div className="text-sm text-center text-muted-foreground">
             Don't have an account?{" "}
-            <a href="/register" className="text-primary hover:underline" data-testid="link-register">
+            <a 
+              href="/register" 
+              className="text-primary hover:underline" 
+              data-testid="link-register"
+            >
               Sign up
             </a>
           </div>

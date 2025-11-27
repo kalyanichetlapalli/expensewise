@@ -1,27 +1,29 @@
-import { useState } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import logoImage from "@assets/Gemini_Generated_Image_gg73flgg73flgg73_1762001408809.png";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    name: "",
-    username: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+  const [, setLocation] = useLocation();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      console.log('Passwords do not match');
-      return;
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation('/');
     }
-    console.log('Registration submitted:', formData);
-  };
+  }, [isAuthenticated, setLocation]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -56,79 +58,41 @@ export default function Register() {
             <p className="text-muted-foreground mt-2">Sign up to start tracking with Expense Wise</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                data-testid="input-name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="johndoe"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                required
-                data-testid="input-username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john.doe@example.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                data-testid="input-email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                required
-                data-testid="input-phone"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                data-testid="input-password"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-                data-testid="input-confirm-password"
-              />
-            </div>
-            <Button type="submit" className="w-full" data-testid="button-register">
-              Sign Up
+          <div className="space-y-4">
+            <Button 
+              onClick={() => loginWithRedirect({ 
+                authorizationParams: { 
+                  screen_hint: 'signup' 
+                } 
+              })} 
+              className="w-full"
+              size="lg"
+              data-testid="button-register"
+            >
+              Sign Up with Auth0
             </Button>
-          </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or
+                </span>
+              </div>
+            </div>
+
+            <Button 
+              onClick={() => loginWithRedirect()} 
+              variant="outline"
+              className="w-full"
+              size="lg"
+              data-testid="button-login-instead"
+            >
+              Sign In Instead
+            </Button>
+          </div>
 
           <div className="text-sm text-center text-muted-foreground">
             Already have an account?{" "}

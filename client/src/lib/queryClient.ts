@@ -1,5 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// Store the access token getter function
+let getAccessToken: () => Promise<string>;
+
+export function setAccessTokenGetter(getter: () => Promise<string>) {
+  getAccessToken = getter;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -12,9 +19,21 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
+  
+  // Add Auth0 token if available
+  if (getAccessToken) {
+    try {
+      const token = await getAccessToken();
+      headers['Authorization'] = `Bearer ${token}`;
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+    }
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -29,8 +48,21 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    const headers: HeadersInit = {};
+    
+    // Add Auth0 token if available
+    if (getAccessToken) {
+      try {
+        const token = await getAccessToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      } catch (error) {
+        console.error('Failed to get access token:', error);
+      }
+    }
+
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
+      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
