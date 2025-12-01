@@ -1,8 +1,17 @@
+import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import { auth } from 'express-oauth2-jwt-bearer';
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// JWT verification middleware for Auth0
+const checkJwt = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER,
+  tokenSigningAlg: 'RS256'
+});
 
 declare module 'http' {
   interface IncomingMessage {
@@ -15,6 +24,18 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false }));
+
+// Protect API routes with JWT authentication
+// Skip authentication in development for easier testing, or apply selectively
+app.use('/api', (req, res, next) => {
+  // Allow OPTIONS requests for CORS preflight
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  
+  // Apply JWT check for all API routes
+  checkJwt(req, res, next);
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
