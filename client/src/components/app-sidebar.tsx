@@ -111,6 +111,7 @@ export function AppSidebar() {
             <span className="text-lg font-semibold">Expense Wise</span>
           </div>
         </div>
+        
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
